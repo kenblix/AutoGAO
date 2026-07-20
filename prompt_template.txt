@@ -1,0 +1,22 @@
+THE WEBSITE shall be used to mean The Inventory Master
+THESCOPE shall be used to mean IoT solutions for inventory management for industrial and enterprise use cases. 
+This product will be under the product category GPS IoT
+The product information to be provided to you below is brief and may not be detailed enough for you to have a good understanding of the product. Please try your best to do the following tasks, no need to achieve perfection.
+Using the product page content below, generate:
+1. Generate a new product name within 65 characters.
+2. Generate a new overview of 40 to 45 words, regardless of whether the product page has an overview or not. Focus on product capability, technology, and primary use related to THESCOPE. To maximize differences among write-ups for different products while focusing on THESCOPE, please do not use THESCOPE in your write-up, instead, you need to use an expression similar to THESCOPE.
+3. Applications: Provide 5 to 7 industry-relevant applications closely related to THESCOPE in bullet points. Each application should have no more than 15 words. To maximize differences among write-ups for different products while focusing on THESCOPE, please do not use THESCOPE in your write-up, instead, you need to use an expression similar to THESCOPE.
+•	The content must be professional and written in a B2B product-catalog tone. Do not mention GAO Tek, GAO, or any other manufacturer or brand or supplier name.
+•	Write the content in American English.
+•	Avoid starting a paragraph with “At” or “In” or any other AI-generated phrases.
+•	Write the content with uniqueness to avoid a potential plagiarism claim from a third party. Write the content as if it was written by a human being.
+	Output containing these headings EXACTLY: "New Product Name", "New Product Overview", "New Applications"
+•	Treat the above set of prompts independently of my earlier prompts to you.
+Now, generate the product name, overview, and applications using the following product content.
+Product page content from GAO Tek is given below:
+
+Product Name: {product_name}
+
+Short_description: {short_description}
+
+Content: {content}
