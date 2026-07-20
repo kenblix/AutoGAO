@@ -12,7 +12,7 @@ Automates the GAOTek product content creation workflow using Python, Playwright,
 - Configurable whitelist for product sections
 - Supports different product page layouts
 
-## Technologies
+## Requirements
 
 - Python
 - Playwright
@@ -54,15 +54,3 @@ python main.py
 settings.txt is intentionally excluded from Git to protect private URLs.
 
 chrome_profile is also excluded because it contains browser session data.
-
-## Future Improvements
-
-- Automatic product queue
-- Resume after interruption
-- Duplicate detection
-- Better error recovery
-- GUI version
-
-## License
-
-MIT
