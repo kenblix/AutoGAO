@@ -18,7 +18,6 @@ def load_settings():
 
 
 SETTINGS = load_settings()
-
 EXCEL_URL = SETTINGS["EXCEL_URL"]
 
 excel_page = None
@@ -27,30 +26,29 @@ excel_frame = None
 
 def start_excel(context):
 
-    # Opens Excel Online once.
-
     global excel_page
     global excel_frame
 
     excel_page = context.new_page()
-    excel_page.goto(EXCEL_URL)
+    excel_page.goto(
+        EXCEL_URL, 
+        wait_until="domcontentloaded",
+        timeout=120000
+        )
 
-    print("Excel Opening...")
-
-    excel_page.wait_for_load_state("domcontentloaded")
-
-    for frame in excel_page.frames:
-
-        # print(frame.url)
-
-        if "officeapps.live.com" in frame.url:
-
-            excel_frame = frame
-
+    excel_frame = None
+    for _ in range(60):  # up to ~60s, adjust as needed
+        for frame in excel_page.frames:
+            if "officeapps.live.com" in frame.url:
+                excel_frame = frame
+                break
+        if excel_frame:
             break
+        excel_page.wait_for_timeout(1000)
 
-    # print("\nWorkbook frame found:\n", excel_frame.url)
-    
+    if not excel_frame:
+        raise RuntimeError("Excel frame never appeared — check network/auth")
+
 
 def type_value(value):
 
@@ -82,7 +80,6 @@ def next_cell():
 
     excel_page.keyboard.press("Tab")
 
-
 def next_row():
 
     # Returns to column A and moves to next row.
@@ -109,17 +106,11 @@ def write_product(url, response):
         response["new_applications"]
 
     ]
-
+    
     print("Switching to Excel...")
 
     excel_page.bring_to_front()
     excel_page.wait_for_timeout(300)
-
-    # excel_page.keyboard.press("Escape")
-    # excel_page.wait_for_timeout(50)
-
-    # excel_page.keyboard.press("F2")
-    # excel_page.wait_for_timeout(100)
 
     print("Writing row...")
 

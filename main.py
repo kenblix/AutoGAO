@@ -8,7 +8,8 @@ from gemini import (
     send_prompt,
     wait_for_generation_to_start,
     wait_for_response,
-    read_response
+    read_response,
+    close_gemini
 )
 from parser.gemini_response import parse_response
 
@@ -20,7 +21,6 @@ from excel import (
     #Startup
 
 context = start_gemini()
-
 start_excel(context)
 
 print(
@@ -113,9 +113,11 @@ while True:
             elif choice == "3":
 
                 print("Goodbye!")
-
+                close_gemini()
                 raise SystemExit
 
             else:
 
                 print("\nInvalid choice. Retrying product.\n")
+
+close_gemini()

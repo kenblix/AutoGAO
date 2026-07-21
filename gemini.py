@@ -11,13 +11,13 @@ AUTO_SEND = True # Set to True to automatically send prompts after auto-pasting
 def start_gemini():
     
     # Starts Chrome and opens Gemini.
-    
     global playwright, context, page
 
     playwright = sync_playwright().start()
 
     context = playwright.chromium.launch_persistent_context(
         user_data_dir="chrome_profile",
+        channel="chrome",
         headless=False
     )
 
@@ -28,21 +28,19 @@ def start_gemini():
         page = context.new_page()
 
     if "gemini.google.com" not in page.url:
-        page.goto("https://gemini.google.com")
+        page.goto(
+            "https://gemini.google.com/app",
+            wait_until="domcontentloaded", timeout=120000
+            )
 
     print("Gemini Opening...")
-
-    page.wait_for_selector('div[role="textbox"]', timeout=300000)
-
+    page.wait_for_selector('div[role="textbox"]', timeout=120000)
     print("✅ Gemini ready!\n")
     
     return context
 
 
 def paste_prompt():
-    """
-    Pastes the clipboard contents into Gemini.
-    """
 
     global page
 
@@ -58,9 +56,8 @@ def paste_prompt():
     print("✅ Prompt pasted.")
 
 def send_prompt():
-    """
-    Clicks Gemini's Send button.
-    """
+    
+    #Clicks Gemini's Send button.
 
     global page
 
@@ -113,9 +110,8 @@ def wait_for_response():
     print("✅ Gemini finished.")
 
 def read_response():
-    """
-    Returns the HTML of Gemini's latest response.
-    """
+
+    #Returns the HTML of Gemini's latest response.
 
     global page
 
@@ -126,3 +122,16 @@ def read_response():
     response.wait_for(state="visible")
 
     return response.inner_html()
+
+def close_gemini():
+    global context, playwright
+    try:
+        if context:
+            context.close()
+    except Exception:
+        pass
+    try:
+        if playwright:
+            playwright.stop()
+    except Exception:
+        pass
