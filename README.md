@@ -1,6 +1,6 @@
 # AutoGAO v1.2
 
-A Python-based workflow automation application for scraping product information, generating AI-powered product content with Google Gemini, writing structured results into Excel, and tracking processing progress.
+A Python-based workflow automation application for scraping product information, generating AI-powered product content with Google Gemini, writing structured results into Excel, and tracking processing progress, Specifically made for GAOTEK site.
 
 ## Features
 
@@ -70,7 +70,7 @@ AutoGAO/
    pip install -r requirements.txt
    ```
 
-3. Configure the Excel workbook link in your local settings file.
+3. Configure the Excel workbook link as "EXCEL_URL = {your link}" file labeled as "settings.txt"
 
 4. Ensure that the required workbook is accessible and that the correct worksheet and starting cell are selected.
 
