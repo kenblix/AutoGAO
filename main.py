@@ -1,65 +1,107 @@
 from parser import scrape_product
+from parser.gemini_response import parse_response
+
 from prompt_builder import build_prompt
 
+from collector import (
+    start_collection,
+    collect_product_urls,
+    close_collection
+)
+
+from bookkeeper import (
+    load_progress,
+    save_new_job,
+    remaining_urls,
+    mark_completed
+)
+
 from gemini import (
-    AUTO_SEND,
-    start_gemini,
+    AUTO_SEND,  
     paste_prompt,
     send_prompt,
     wait_for_generation_to_start,
     wait_for_response,
-    read_response,
-    close_gemini
-)
-from parser.gemini_response import parse_response
-
-from excel import (
-    start_excel,
-    write_product
+    read_response
 )
 
-    #Startup
-
-context = start_gemini()
-start_excel(context)
-
-print(
-"""
-==========================================
-            AutoGAO Ready
-==========================================
-
-Please make sure:
-
-✓ Gemini is fully loaded
-✓ Excel workbook is loaded
-✓ Cell A of the next empty row is selected
-
-Press ENTER to begin...
-"""
+from startup import (
+    start_processing,
+    close_processing
 )
-input()
+
+from excel import write_product
+
+from menu import (
+    ask_product_amount,
+    main_menu,
+    processing_summary,
+    product_error_menu
+)
+
+class StopProcessing(Exception):
+    pass
 
 
-                    # Main Loop
+def new_job():
 
-while True:
+    category_url = input(
+        "\nCategory URL: "
+    ).strip()
 
-    url = input("\nProduct URL (or type exit): ").strip()
+    start_collection()
 
-    if url.lower() == "exit":
-        print("Goodbye!")
-        break
+    try:
+
+        category_name, all_urls = collect_product_urls(category_url)
+
+    finally:
+
+        close_collection()
+
+    save_new_job(
+        category_name,
+        category_url,
+        all_urls
+    )
+
+    print(f"\n✅ New job created!")
+    print(f"Category : {category_name}")
+    print(f"Products : {len(all_urls)}\n")
+
+def continue_job():
+
+    urls = remaining_urls()
+
+    if not urls:
+
+        print("\n This job is already complete.\n")
+
+        return None
+
+    print(f"\nRemaining products: {len(urls)}\n")
+
+    return urls
+
+def prepare_run():
+
+    urls = continue_job()
+
+    if urls is None:
+        return None
+
+    amount = ask_product_amount()
+
+    return urls[:amount]
 
 
-                    # Retry loop
+def process_product(url):
 
     while True:
-        
+
         try:
 
             product = scrape_product(url)
-            # print(product)
 
             build_prompt(product)
 
@@ -73,30 +115,20 @@ while True:
             wait_for_response()
 
             html = read_response()
-            # print(html)
 
             response = parse_response(html)
-            # print(response)
 
             write_product(url, response)
 
+            mark_completed(url)
+
             print("✅ Product completed.\n")
 
-            break
+            return
 
         except Exception as e:
 
-            print("\n==========================================")
-            print("Error while processing product.\n")
-            print(e)
-            print("==========================================\n")
-
-            choice = input(
-                "1. Retry this product\n"
-                "2. Skip this product\n"
-                "3. Exit\n\n"
-                "Choice: "
-            ).strip()
+            choice = product_error_menu(e)
 
             if choice == "1":
 
@@ -108,16 +140,75 @@ while True:
 
                 print("\nSkipping product.\n")
 
-                break
+                return
 
             elif choice == "3":
 
-                print("Goodbye!")
-                close_gemini()
-                raise SystemExit
+                raise StopProcessing
 
             else:
 
                 print("\nInvalid choice. Retrying product.\n")
 
-close_gemini()
+def process_products(urls):
+
+    try:
+
+        for number, url in enumerate(urls, start=1):
+
+            print(
+                f"\n========== Product {number}/{len(urls)} ==========\n"
+            )
+
+            process_product(url)
+
+        print("\n Processing complete!\n")
+
+    except StopProcessing:
+
+        print("\nProcessing stopped by user.\n")
+
+while True:
+
+    progress = load_progress()
+    choice = main_menu(progress)
+
+    if choice == "1":
+
+        urls = prepare_run()
+
+    elif choice == "2":
+
+        new_job()
+
+        urls = prepare_run()
+
+    elif choice == "3":
+
+        close_processing()
+        print("\nGoodbye!")
+        break
+
+    else:
+
+        print("\nInvalid choice.\n")
+        continue
+
+    if not urls:
+
+        continue
+
+    start_processing()
+
+    progress = load_progress()
+
+    remaining=len(remaining_urls())
+
+    processing_summary(
+        category_name=progress["category_name"],
+        remaining=remaining,
+        processing=len(urls),
+        remaining_after=remaining - len(urls)
+    )
+
+    process_products(urls)

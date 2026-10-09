@@ -241,3 +241,11 @@ test.py
 test2.py
 test_profile/
 test_profile2/
+
+progress/
+chrome_profile/
+test_profile/
+test_profile2/
+__pycache__/
+*.pyc
+tools/

@@ -124,3 +124,13 @@ def write_product(url, response):
             next_cell()
 
     next_row()
+
+def get_excel_page():
+    """
+    Returns the Excel page object so other modules
+    (like temp.py) can control the Excel window.
+    """
+
+    global excel_page
+
+    return excel_page
